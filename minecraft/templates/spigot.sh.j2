@@ -1,0 +1,35 @@
+#!/bin/sh
+#Start-Stop here
+case "$1" in
+  start)
+    cd /opt/minecraft/
+    java -Xms{{memory}}M -Xmx{{memory}}M  -XX:+UseConcMarkSweepGC -jar /opt/minecraft/spigot.jar nogui
+    chown -R :root /opt/minecraft/logs
+    ;;
+  stop)
+    cd /opt/minecraft/
+    kill -9 $(ps aux | grep /opt/minecraft| grep -v grep | awk '{print $2}')
+    chown -R :root /opt/minecraft/logs
+    ;;
+  restart)
+    cd /opt/minecraft/
+    kill -9 $(ps aux | grep /opt/minecraft| grep -v grep | awk '{print $2}')
+    java -Xms{{memory}} -Xmx{{memory}}M  -XX:+UseConcMarkSweepGC -jar /opt/minecraft/spigot.jar nogui
+    chown -R :root /opt/minecraft/logs
+    ;;
+  status)
+    if ps aux | grep /opt/minecraft| grep -v grep | awk '{print $2}' > /dev/null
+    then
+      echo "$SERVICE is running."
+    else
+      echo "$SERVICE is not running."
+    fi
+    ;;
+
+  *)
+  echo "Usage: /etc/init.d/minecraft {start|stop|status|restart|command \"server command\"}"
+  exit 1
+  ;;
+esac
+
+exit 0

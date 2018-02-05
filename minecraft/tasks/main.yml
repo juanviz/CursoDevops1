@@ -1,0 +1,51 @@
+---
+# tasks file for logcraft-config
+- template: src=minecraft.sh.j2 dest=/etc/init.d/minecraft owner=root group=root mode=0755
+  when: host != "pi"
+- template: src=spigot.sh.j2 dest=/etc/init.d/minecraft owner=root group=root mode=0755
+  when: host == "pi" 
+
+# Run the equivalent of "apt-get update" as a separate step
+- apt: update_cache=yes
+- apt: name=minecraft-pi state=present
+  when: host == "pi"
+- apt: name=oracle-java8-jdk state=present
+  when: host == "pi"
+- apt: name=oracle-java8-installer state=present
+  when: host != "pi" 
+- file: path=/opt/minecraft state=directory owner={{minecraft_user}} group={{minecraft_user}} mode=0775 recurse=yes
+- copy: src=spigot-1.9.2.jar dest=/opt/minecraft/spigot.jar owner={{minecraft_user}} group={{minecraft_user}} mode=0755
+  when: host == "pi"
+- copy: src=minecraft.jar dest=/opt/minecraft/minecraft.jar owner={{minecraft_user}} group={{minecraft_user}} mode=0755
+  when: host == "pi"
+- copy: src={{minecraft_server}} dest=/opt/minecraft/{{minecraft_server}} owner={{minecraft_user}} group={{minecraft_user}} mode=0755
+  when: host != "pi" 
+- file: path=/opt/minecraft/logs state=directory owner={{minecraft_user}} group=syslog mode=0775 recurse=yes
+  when: host != "pi" 
+- file: path=/opt/minecraft/logs state=directory owner={{minecraft_user}} group=root mode=0775 recurse=yes
+  when: host == "pi" 
+- copy: src=NoSpawnChunks.jar dest=/opt/minecraft/plugins/NoSpawnChunks.jar owner={{minecraft_user}} group={{minecraft_user}} mode=0755
+  when: host == "pi"
+- name: server.properties 
+  template: src="server.properties.j2" dest=/opt/minecraft/server.properties owner={{minecraft_user}} group={{minecraft_user}} mode=0755
+- copy: src=eula.txt dest=/opt/minecraft/eula.txt owner={{minecraft_user}} group={{minecraft_user}} mode=0755  
+
+- name: minecraft state=stopped
+  shell:  /etc/init.d/minecraft stop
+  sudo: yes
+  when: boot == "yes"
+
+- name: minecraft state=started
+  shell: /etc/init.d/minecraft start
+  sudo: yes
+  when: boot == "yes"
+
+- file: path=/opt/minecraft/logs/latest.log state=file owner={{minecraft_user}} group=root mode=0775
+  when: host == "pi" 
+- service: name=rsyslog state=stopped
+  sudo: yes
+- service: name=rsyslog state=started
+  sudo: yes
+
+
+

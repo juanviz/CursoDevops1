@@ -1,0 +1,3 @@
+- hosts: '{{host}}'
+  roles:
+    - yauh.java8

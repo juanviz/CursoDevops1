@@ -1,0 +1,4 @@
+- hosts: '{{host}}'
+  roles:
+    - { role: yauh.java8, when: host != 'pi' }
+    - minecraft
