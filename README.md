@@ -1,5 +1,24 @@
 Role Name
 =========
+Terraform plan 
+--------------
+For create the infrastructure in AWS execute: 
+
+terraform plan
+
+terraform apply
+
+For get a graph with the resources creted with terraform ...
+
+sudo apt-get install graphviz or http://www.graphviz.org/Download..php
+
+terraform graph | dot -Tpng > minecraftTF.png
+
+ansible-playbook  -i minecraft/inventory.yml -u ubuntu --sudo minecraft/minecraft.yml  --extra-vars "host=ec2 boot=yes"
+
+ansible-playbook -i -i minecraft/inventory.yml -u ubuntu --sudo minecraft/minecraft.yml  --extra-vars "host=ec2 ansible_user=ubuntu boot=yes minecraft_user=ubuntu minecraft_server=minecraft_server.1.12.2.jar max_player=20 distance=10 memory=678"
+
+terraform destroy
 
 Ansible Roles 
 
