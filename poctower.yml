@@ -6,10 +6,9 @@
       ec2:
         key_name: "{{ aws_keypair }}"
         instance_type: t2.micro
-        image: ami-26ebbc5c
+        image: ami-b6a016d9
         wait: yes
         count: 1
         vpc_subnet_id: "{{ id_subnet }}"
         assign_public_ip: yes
-        group: server
         region: eu-central-1
