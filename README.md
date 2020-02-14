@@ -14,34 +14,19 @@ sudo apt-get install graphviz or http://www.graphviz.org/Download..php
 
 terraform graph | dot -Tpng > minecraftTF.png
 
-ansible-playbook  -i minecraft/inventory.yml -u ubuntu --sudo minecraft/minecraft.yml  --extra-vars "host=ec2 boot=yes"
+# Deploy in ec2 instance with Ubuntu
+ansible-playbook  -i minecraft/inventory.yml -u ubuntu  minecraft/minecraft.yml  --extra-vars "host=ec2 mode=pi boot=yes"
 
-ansible-playbook -i -i minecraft/inventory.yml -u ubuntu --sudo minecraft/minecraft.yml  --extra-vars "host=ec2 ansible_user=ubuntu boot=yes minecraft_user=ubuntu minecraft_server=minecraft_server.1.12.2.jar max_player=20 distance=10 memory=678"
+# Deploy in Raspberry Pi with Ubuntu
+ansible-playbook  -i minecraft/inventory.yml -u ubuntu  minecraft/minecraft.yml  --extra-vars "host=pi mode=pi boot=yes"
+
+# Deploy in microk8s in a Raspberry Pi with Ubuntu
+ansible-playbook  -i minecraft/inventory.yml -u ubuntu  minecraft/minecraft.yml  --extra-vars "host=pi mode=k8s"
+
+#TODO
+change minecraft image for k8s depends of the architecture (current Dockerfile is for Raspberry Pi 4)
 
 terraform destroy
-
-Ansible Roles 
-
-Requirements
-------------
-Ansible (Tested in 1.9)
-SSH access to servers (Recommended RSA keypairs for SSH access)
-
-
-Example Playbook
-----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-- hosts: '{{host}}'
-  roles:
-    - { role: /Users/jvherrera/repositories/minecraft_ansible/yauh.java8, when: host != 'pi' }
-    - /Users/jvherrera/repositories/minecraft_ansible/minecraft
-
-Usage
-----------------
-ansible-playbook  -i inventory.yml -u pi --ask-pass --sudo minecraft.yml  --extra-vars "host=pi boot=yes/no (optional)" //with password user
-ansible-playbook  -i inventory.yml -u ubuntu --sudo minecraft.yml  --extra-vars "host=ec2 boot=yes/no (optional)" //with keypair RSA
 
 Kubernetes Cluster with kops and Minecraft in AWS
 -------------------------------------------------
