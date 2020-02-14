@@ -1,0 +1,35 @@
+---
+- name: Install microk8s for Canonical Kubernetes
+  snap:
+    name: microk8s
+    classic: yes
+  become: yes  
+
+- name: enable microk8s
+  command: microk8s.enable
+  become: yes
+  when: boot == "yes"
+
+- name: enable microk8s dns dashboard ingress
+  command: microk8s.enable dns dashboard ingress
+  become: yes
+  when: boot == "yes"
+
+- name: start microk8s
+  command: microk8s.start
+  become: yes
+  when: boot == "yes"
+ 
+- name: Create a k8s Minecraft namespace
+  shell:  microk8s.kubectl create namespace minecraft
+  become: yes
+- copy: src=deployment-minecraft.yaml dest=$HOME/deployment-minecraft.yaml owner={{minecraft_user}} group={{minecraft_user}} mode=0755  
+- copy: src=service-minecraft.yaml dest=$HOME/service-minecraft.yaml owner={{minecraft_user}} group={{minecraft_user}} mode=0755  
+
+- name: Create a Minecraft Deployment by reading the definition from a local file
+  shell:  microk8s.kubectl create -f deployment-minecraft.yaml --namespace=minecraft
+  become: yes
+
+- name: Create a Minecraft Service object by reading the definition from a file
+  shell:  microk8s.kubectl create -f service-minecraft.yaml --namespace=minecraft
+  become: yes

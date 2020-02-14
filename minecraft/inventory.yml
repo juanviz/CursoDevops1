@@ -1,13 +1,13 @@
 [pi]
-192.168.1.56
+192.168.1.132
 [ec2]
-34.251.112.9
+130.61.94.15
 [raspberry:children]
 pi
 
 [raspberry:vars]
-ansible_user=pi 
-minecraft_user=pi
+ansible_user=ubuntu
+minecraft_user=ubuntu
 minecraft_server=spigot.jar
 max_player=5
 distance=04
@@ -19,7 +19,7 @@ ec2
 [servers:vars]
 ansible_user=ubuntu 
 minecraft_user=ubuntu
-minecraft_server=minecraft_server.1.12.2.jar
+minecraft_server=server.jar
 max_player=20
 distance=10
 memory=678

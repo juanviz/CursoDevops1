@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minecraft
+  name: minecraft
+  namespace: minecraft
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - nodePort: 32429
+    port: 25565
+    protocol: TCP
+    targetPort: 25565
+  selector:
+    app: minecraft
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}

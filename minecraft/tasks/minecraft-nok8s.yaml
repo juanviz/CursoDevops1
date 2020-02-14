@@ -1,0 +1,65 @@
+---
+# tasks file for logcraft-config
+- template: src=minecraft.sh.j2 dest=/etc/init.d/minecraft owner=root group=root mode=0755
+  when: host != "pi"
+  become: yes
+- template: src=spigot.sh.j2 dest=/etc/init.d/minecraft owner=root group=root mode=0755
+  when: host == "pi" 
+  become: yes
+# Run the equivalent of "apt-get update" as a separate step
+- name: Update repos
+  apt: 
+    update_cache: yes
+  become: yes  
+#- apt: name=minecraft-pi state=present
+#  when: host == "pi"
+#- apt: name=oracle-java8-jdk state=present
+#  when: host == "pi"
+#- apt: name=oracle-java8-installer state=present
+#  when: host != "pi" 
+- name: install Java
+  apt: 
+    name: openjdk-8-jdk
+    state: present
+    update_cache: yes  
+  become: yes  
+- file: path=/opt/minecraft state=directory owner={{minecraft_user}} group={{minecraft_user}} mode=0775 recurse=yes
+  become: yes
+- copy: src=spigot-1.10.2.jar dest=/opt/minecraft/spigot.jar owner={{minecraft_user}} group={{minecraft_user}} mode=0755
+  when: host == "pi"
+- copy: src=Minecraft.jar dest=/opt/minecraft/minecraft.jar owner={{minecraft_user}} group={{minecraft_user}} mode=0755
+  when: host == "pi"
+- copy: src={{minecraft_server}} dest=/opt/minecraft/{{minecraft_server}} owner={{minecraft_user}} group={{minecraft_user}} mode=0755
+  when: host != "pi" 
+- file: path=/opt/minecraft/logs state=directory owner={{minecraft_user}} group=syslog mode=0775 recurse=yes
+  when: host != "pi" 
+  become: yes
+- file: path=/opt/minecraft/logs state=directory owner={{minecraft_user}} group=root mode=0775 recurse=yes
+  become: yes
+  when: host == "pi" 
+- file: path=/opt/minecraft/plugins state=directory owner={{minecraft_user}} group=root mode=0775 recurse=yes
+  become: yes
+  when: host == "pi"
+- copy: src=NoSpawnChunks.jar dest=/opt/minecraft/plugins/NoSpawnChunks.jar owner={{minecraft_user}} group={{minecraft_user}} mode=0755
+  when: host == "pi"
+- name: server.properties 
+  template: src="server.properties.j2" dest=/opt/minecraft/server.properties owner={{minecraft_user}} group={{minecraft_user}} mode=0755
+- copy: src=eula.txt dest=/opt/minecraft/eula.txt owner={{minecraft_user}} group={{minecraft_user}} mode=0755  
+
+- name: minecraft state=stopped
+  shell:  /etc/init.d/minecraft stop
+  become: yes
+  when: boot == "yes"
+
+- name: minecraft state=started
+  shell: nohup /etc/init.d/minecraft start &
+  become: yes
+  when: boot == "yes"
+
+- service: name=rsyslog state=stopped
+  become: yes
+- service: name=rsyslog state=started
+  become: yes
+
+
+
